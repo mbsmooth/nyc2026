@@ -59,6 +59,15 @@ export default function Suggestions() {
       if (res.ok) {
         const newItem = await res.json();
         setItems(prev => [newItem, ...prev]);
+        fetch('/api/activity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            traveler,
+            action: 'suggest',
+            detail: `Suggested "${form.name}" (${form.type})`,
+          }),
+        }).catch(() => {});
         setForm({ type: 'restaurant', name: '', location: '', notes: '', day: '' });
       } else {
         // store locally if API is down

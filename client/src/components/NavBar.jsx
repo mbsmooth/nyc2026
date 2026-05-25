@@ -6,6 +6,7 @@ const NAV = [
   { to: '/restaurants', icon: '🍽️', label: 'Eat' },
   { to: '/suggestions', icon: '💡', label: 'Ideas' },
   { to: '/quickref', icon: '📋', label: 'Info' },
+  { to: '/activity', icon: '📊', label: 'Log' },
 ];
 
 export default function NavBar() {

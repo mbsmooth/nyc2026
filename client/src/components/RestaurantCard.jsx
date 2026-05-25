@@ -1,13 +1,14 @@
 const PRICE = ['', '$', '$$', '$$$', '$$$$'];
 
-export default function RestaurantCard({ option, index, votes, myVote, onVote, totalVoters }) {
+export default function RestaurantCard({ option, index, votes, myVote, onVote, totalVoters, onRemove }) {
   const count = votes?.[index] ?? 0;
   const pct = totalVoters > 0 ? Math.round((count / totalVoters) * 100) : 0;
   const isLeading = count > 0 && count === Math.max(...Object.values(votes || {}));
+  const isMyPick = myVote === index;
 
   return (
     <div className={`bg-white rounded-2xl border-2 transition-all ${
-      myVote === index ? 'border-blue-500 shadow-blue-100 shadow-md' : 'border-slate-100 shadow-sm'
+      isMyPick ? 'border-blue-500 shadow-blue-100 shadow-md' : 'border-slate-100 shadow-sm'
     }`}>
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
@@ -36,6 +37,15 @@ export default function RestaurantCard({ option, index, votes, myVote, onVote, t
             </div>
             <p className="text-sm text-slate-600 mt-1.5 leading-snug">{option.why}</p>
           </div>
+          {onRemove && (
+            <button
+              onClick={onRemove}
+              className="text-slate-300 hover:text-red-400 transition-colors text-lg shrink-0 leading-none"
+              title="Remove from list"
+            >
+              ×
+            </button>
+          )}
         </div>
 
         {/* Vote bar */}
@@ -47,7 +57,7 @@ export default function RestaurantCard({ option, index, votes, myVote, onVote, t
             </div>
             <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all ${myVote === index ? 'bg-blue-500' : 'bg-slate-300'}`}
+                className={`h-full rounded-full transition-all ${isMyPick ? 'bg-blue-500' : 'bg-slate-300'}`}
                 style={{ width: `${pct}%` }}
               />
             </div>
@@ -55,24 +65,36 @@ export default function RestaurantCard({ option, index, votes, myVote, onVote, t
         )}
 
         <div className="flex gap-2 mt-3">
-          <button
-            onClick={() => onVote(index)}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-              myVote === index
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            {myVote === index ? '✓ My Pick' : 'Vote'}
-          </button>
-          <a
-            href={option.mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-3 py-2.5 rounded-xl bg-slate-100 text-slate-600 text-sm font-medium hover:bg-slate-200 transition-colors"
-          >
-            📍
-          </a>
+          {isMyPick ? (
+            <>
+              <div className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-blue-600 text-white text-center">
+                ✓ My Pick
+              </div>
+              <button
+                onClick={() => onVote(index)}
+                className="px-3 py-2.5 rounded-xl bg-red-50 text-red-400 text-sm font-semibold hover:bg-red-100 active:scale-95 transition-all"
+              >
+                Remove
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => onVote(index)}
+              className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 active:scale-95 transition-all"
+            >
+              Vote
+            </button>
+          )}
+          {option.mapsUrl && (
+            <a
+              href={option.mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-2.5 rounded-xl bg-slate-100 text-slate-600 text-sm font-medium hover:bg-slate-200 transition-colors"
+            >
+              📍
+            </a>
+          )}
           {option.menuUrl && (
             <a
               href={option.menuUrl}

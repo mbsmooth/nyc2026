@@ -27,6 +27,11 @@ export default function TravelerPicker({ onSelect }) {
   function submit(e) {
     e.preventDefault();
     if (pw === PASSWORD) {
+      fetch('/api/activity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ traveler: selected, action: 'login', detail: 'Logged in' }),
+      }).catch(() => {});
       onSelect(selected);
     } else {
       setError(true);

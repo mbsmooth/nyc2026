@@ -1,10 +1,12 @@
 import { useState } from 'react';
 
-export default function PlacesSearch({ coordinates, area }) {
+export default function PlacesSearch({ coordinates, area, mealId, traveler, onAdd }) {
   const [keyword, setKeyword] = useState('');
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [added, setAdded] = useState({});   // placeId → 'added' | 'duplicate'
+  const [adding, setAdding] = useState({}); // placeId → true while saving
 
   async function search() {
     if (!keyword.trim()) return;
@@ -27,6 +29,14 @@ export default function PlacesSearch({ coordinates, area }) {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleAdd(place) {
+    if (!onAdd) return;
+    setAdding(prev => ({ ...prev, [place.placeId]: true }));
+    const result = await onAdd(place);
+    setAdding(prev => ({ ...prev, [place.placeId]: false }));
+    setAdded(prev => ({ ...prev, [place.placeId]: result === 'duplicate' ? 'duplicate' : result ? 'added' : 'error' }));
   }
 
   return (
@@ -66,31 +76,58 @@ export default function PlacesSearch({ coordinates, area }) {
 
       {results && results.length > 0 && (
         <div className="mt-3 space-y-2">
-          {results.map(p => (
-            <div key={p.placeId} className="flex items-start justify-between gap-3 p-3 bg-slate-50 rounded-xl">
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-slate-900 text-sm truncate">{p.name}</div>
-                <div className="text-xs text-slate-500 truncate mt-0.5">{p.address}</div>
-                <div className="flex items-center gap-2 mt-1">
-                  {p.rating && <span className="text-xs font-semibold text-amber-600">⭐ {p.rating}</span>}
-                  {p.totalRatings && <span className="text-xs text-slate-400">({p.totalRatings.toLocaleString()})</span>}
-                  {p.openNow !== undefined && (
-                    <span className={`text-xs font-medium ${p.openNow ? 'text-green-600' : 'text-red-500'}`}>
-                      {p.openNow ? '● Open' : '● Closed'}
-                    </span>
-                  )}
+          {results.map(p => {
+            const addedState = added[p.placeId];
+            return (
+              <div key={p.placeId} className="p-3 bg-slate-50 rounded-xl">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-slate-900 text-sm truncate">{p.name}</div>
+                    <div className="text-xs text-slate-500 truncate mt-0.5">{p.address}</div>
+                    <div className="flex items-center gap-2 mt-1">
+                      {p.rating && <span className="text-xs font-semibold text-amber-600">⭐ {p.rating}</span>}
+                      {p.totalRatings && <span className="text-xs text-slate-400">({p.totalRatings.toLocaleString()})</span>}
+                      {p.openNow !== undefined && (
+                        <span className={`text-xs font-medium ${p.openNow ? 'text-green-600' : 'text-red-500'}`}>
+                          {p.openNow ? '● Open' : '● Closed'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <a
+                    href={p.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 bg-white border border-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-slate-100"
+                  >
+                    Maps
+                  </a>
                 </div>
+
+                {onAdd && (
+                  <button
+                    onClick={() => handleAdd(p)}
+                    disabled={!!addedState || adding[p.placeId]}
+                    className={`mt-2 w-full py-2 rounded-xl text-xs font-semibold transition-all active:scale-95 ${
+                      addedState === 'added'
+                        ? 'bg-green-100 text-green-700'
+                        : addedState === 'duplicate'
+                        ? 'bg-slate-100 text-slate-400'
+                        : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                    }`}
+                  >
+                    {adding[p.placeId]
+                      ? 'Adding…'
+                      : addedState === 'added'
+                      ? '✓ Added to vote'
+                      : addedState === 'duplicate'
+                      ? 'Already in list'
+                      : '+ Add to vote'}
+                  </button>
+                )}
               </div>
-              <a
-                href={p.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 bg-white border border-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-slate-100"
-              >
-                Maps
-              </a>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

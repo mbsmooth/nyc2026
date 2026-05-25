@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const voteSchema = new mongoose.Schema({
   mealId: { type: String, required: true },
-  optionIndex: { type: Number, required: true },
+  optionIndex: { type: mongoose.Schema.Types.Mixed, required: true },
   traveler: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });

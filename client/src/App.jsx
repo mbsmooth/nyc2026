@@ -7,6 +7,7 @@ import Itinerary from './pages/Itinerary.jsx';
 import Restaurants from './pages/Restaurants.jsx';
 import Suggestions from './pages/Suggestions.jsx';
 import QuickRef from './pages/QuickRef.jsx';
+import Activity from './pages/Activity.jsx';
 
 export const TravelerCtx = createContext(null);
 export const useTraveler = () => useContext(TravelerCtx);
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/restaurants" element={<Restaurants />} />
             <Route path="/suggestions" element={<Suggestions />} />
             <Route path="/quickref" element={<QuickRef />} />
+            <Route path="/activity" element={<Activity />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

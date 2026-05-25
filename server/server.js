@@ -5,6 +5,8 @@ import mongoose from 'mongoose';
 import votesRouter from './routes/votes.js';
 import placesRouter from './routes/places.js';
 import suggestionsRouter from './routes/suggestions.js';
+import activityRouter from './routes/activity.js';
+import mealOptionsRouter from './routes/mealOptions.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -22,6 +24,8 @@ if (process.env.MONGO_URI) {
 app.use('/api/votes', votesRouter);
 app.use('/api/places', placesRouter);
 app.use('/api/suggestions', suggestionsRouter);
+app.use('/api/activity', activityRouter);
+app.use('/api/meal-options', mealOptionsRouter);
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
