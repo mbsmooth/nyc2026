@@ -1,0 +1,12 @@
+{
+  "name": "nyc2026",
+  "private": true,
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "dev": "concurrently -n SERVER,CLIENT -c cyan,magenta \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "install:all": "npm install && npm install --workspace=client && npm install --workspace=server"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
