@@ -18,7 +18,10 @@ RUN npm run build --workspace=client
 FROM nginx:1.27-alpine
 
 COPY --from=builder /app/client/dist /usr/share/nginx/html
-COPY client/nginx.conf /etc/nginx/conf.d/default.conf
+# Use nginx's built-in template processor so API_UPSTREAM can be injected at runtime
+COPY client/nginx.conf /etc/nginx/templates/default.conf.template
+
+ENV API_UPSTREAM=http://server:3001
 
 EXPOSE 80
 
