@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 
-function getDaysUntil(dateStr) {
+function getTimeUntil(dateStr) {
   const now = new Date();
   const target = new Date(dateStr + 'T00:00:00');
   const diff = target - now;
   if (diff <= 0) return null;
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const totalMinutes = Math.floor(diff / (1000 * 60));
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const minutes = totalMinutes % 60;
+  return { days, hours, minutes };
 }
 
 function isTripActive() {
@@ -27,12 +31,13 @@ function todayLabel() {
 }
 
 export default function CountdownBanner() {
-  const [days, setDays] = useState(() => getDaysUntil('2026-06-09'));
+  const [time, setTime] = useState(() => getTimeUntil('2026-06-09'));
 
   useEffect(() => {
-    const t = setInterval(() => setDays(getDaysUntil('2026-06-09')), 60000);
+    const interval = time?.days === 0 ? 1000 : 60000;
+    const t = setInterval(() => setTime(getTimeUntil('2026-06-09')), interval);
     return () => clearInterval(t);
-  }, []);
+  }, [time?.days]);
 
   if (isTripActive()) {
     const label = todayLabel();
@@ -45,7 +50,7 @@ export default function CountdownBanner() {
     );
   }
 
-  if (days === null) {
+  if (time === null) {
     return (
       <div className="bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-2xl p-4 text-center shadow-md">
         <div className="font-bold text-lg">Trip complete — great memories! 🗽</div>
@@ -56,8 +61,32 @@ export default function CountdownBanner() {
   return (
     <div className="bg-gradient-to-r from-nyc-blue to-blue-800 text-white rounded-2xl p-5 text-center shadow-md">
       <div className="text-slate-300 text-sm font-medium uppercase tracking-wider mb-1">NYC Trip in</div>
-      <div className="text-5xl font-extrabold tabular-nums">{days}</div>
-      <div className="text-blue-200 mt-1 text-base font-medium">{days === 1 ? 'day' : 'days'}</div>
+      <div className="flex items-end justify-center gap-3">
+        {time.days > 0 && (
+          <div className="text-center">
+            <div className="text-5xl font-extrabold tabular-nums">{time.days}</div>
+            <div className="text-blue-200 text-base font-medium">{time.days === 1 ? 'day' : 'days'}</div>
+          </div>
+        )}
+        {(time.days > 0 ? time.hours > 0 : true) && (
+          <>
+            {time.days > 0 && <div className="text-blue-300 text-3xl font-light mb-1">&</div>}
+            <div className="text-center">
+              <div className="text-5xl font-extrabold tabular-nums">{time.hours}</div>
+              <div className="text-blue-200 text-base font-medium">{time.hours === 1 ? 'hr' : 'hrs'}</div>
+            </div>
+          </>
+        )}
+        {time.days === 0 && (
+          <>
+            <div className="text-blue-300 text-3xl font-light mb-1">&</div>
+            <div className="text-center">
+              <div className="text-5xl font-extrabold tabular-nums">{time.minutes}</div>
+              <div className="text-blue-200 text-base font-medium">{time.minutes === 1 ? 'min' : 'mins'}</div>
+            </div>
+          </>
+        )}
+      </div>
       <div className="text-blue-300 text-sm mt-2">June 9 – 12, 2026</div>
     </div>
   );
