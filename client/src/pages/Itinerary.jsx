@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DAYS } from '../data/itinerary.js';
+import { MEALS } from '../data/restaurants.js';
 import EventItem from '../components/EventItem.jsx';
+
+const MEAL_IDS = [...new Set(DAYS.flatMap(d => d.events.filter(e => e.mealId).map(e => e.mealId)))];
 
 const DAY_COLORS = {
   blue:   { tab: 'bg-blue-600 text-white',   header: 'from-blue-600 to-blue-800' },
@@ -16,6 +19,34 @@ function todayDayId() {
 
 export default function Itinerary() {
   const [active, setActive] = useState(() => todayDayId() ?? DAYS[0].id);
+  const [mealWinners, setMealWinners] = useState({});
+
+  useEffect(() => {
+    async function fetchWinners() {
+      const results = {};
+      await Promise.all(MEAL_IDS.map(async mealId => {
+        try {
+          const [votesRes, optsRes] = await Promise.all([
+            fetch(`/api/votes/${mealId}`),
+            fetch(`/api/meal-options/${mealId}`),
+          ]);
+          const { tally } = await votesRes.json();
+          const customOptions = optsRes.ok ? await optsRes.json() : [];
+          if (!tally || !Object.keys(tally).length) return;
+          const [winnerKey] = Object.entries(tally).sort(([, a], [, b]) => b - a)[0];
+          const asNum = Number(winnerKey);
+          const meal = MEALS.find(m => m.id === mealId);
+          const name = Number.isInteger(asNum) && !isNaN(asNum)
+            ? meal?.options[asNum]?.name
+            : customOptions.find(o => o._id === winnerKey)?.name;
+          if (name) results[mealId] = name;
+        } catch {}
+      }));
+      setMealWinners(results);
+    }
+    fetchWinners();
+  }, []);
+
   const day = DAYS.find(d => d.id === active);
   const colors = DAY_COLORS[day.color];
 
@@ -52,7 +83,7 @@ export default function Itinerary() {
       {/* Events */}
       <div className="px-4 py-4 space-y-3">
         {day.events.map((event, i) => (
-          <EventItem key={i} event={event} />
+          <EventItem key={i} event={event} winner={event.mealId ? mealWinners[event.mealId] : undefined} />
         ))}
       </div>
     </div>

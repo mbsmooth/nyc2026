@@ -192,45 +192,44 @@ export default function Restaurants() {
           )}
         </div>
 
-        {/* Static options */}
+        {/* All options sorted by votes */}
         <div className="space-y-3">
-          {meal.options.map((option, i) => (
-            <RestaurantCard
-              key={i}
-              option={option}
-              index={i}
-              votes={tally}
-              myVote={myVote}
-              onVote={handleVote}
-              totalVoters={totalVoters}
-            />
-          ))}
-        </div>
-
-        {/* Custom options added from search */}
-        {customOptions.length > 0 && (
-          <div className="space-y-3">
-            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide px-1">Added by the group</div>
-            {customOptions.map(opt => (
+          {[
+            ...meal.options.map((option, i) => ({
+              key: `s-${i}`,
+              option,
+              index: i,
+              voteCount: tally[i] ?? 0,
+              onRemove: undefined,
+            })),
+            ...customOptions.map(opt => ({
+              key: `c-${opt._id}`,
+              option: {
+                name: opt.name,
+                address: opt.address,
+                rating: opt.rating,
+                mapsUrl: opt.mapsUrl,
+                vibe: `Added by ${opt.addedBy}`,
+              },
+              index: opt._id,
+              voteCount: tally[opt._id] ?? 0,
+              onRemove: opt.addedBy === traveler ? () => removeCustomOption(opt._id) : undefined,
+            })),
+          ]
+            .sort((a, b) => b.voteCount - a.voteCount)
+            .map(({ key, option, index, onRemove }) => (
               <RestaurantCard
-                key={opt._id}
-                option={{
-                  name: opt.name,
-                  address: opt.address,
-                  rating: opt.rating,
-                  mapsUrl: opt.mapsUrl,
-                  vibe: `Added by ${opt.addedBy}`,
-                }}
-                index={opt._id}
+                key={key}
+                option={option}
+                index={index}
                 votes={tally}
                 myVote={myVote}
                 onVote={handleVote}
                 totalVoters={totalVoters}
-                onRemove={opt.addedBy === traveler ? () => removeCustomOption(opt._id) : undefined}
+                onRemove={onRemove}
               />
             ))}
-          </div>
-        )}
+        </div>
 
         {/* Find alternatives */}
         <PlacesSearch

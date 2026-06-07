@@ -8,7 +8,7 @@ const STATUS = {
   bonus:   { bg: 'bg-purple-50', border: 'border-purple-200', dot: 'bg-purple-500', label: 'Bonus' },
 };
 
-export default function EventItem({ event }) {
+export default function EventItem({ event, winner }) {
   const navigate = useNavigate();
   const now = useNow();
 
@@ -61,8 +61,10 @@ export default function EventItem({ event }) {
             </div>
           )}
           {display.mealId && (
-            <div className="mt-2 text-xs text-blue-600 font-medium flex items-center gap-1">
-              Tap to vote on restaurants →
+            <div className="mt-2 text-xs font-medium flex items-center gap-1">
+              {winner
+                ? <span className="text-green-700">🏆 {winner} — tap to change</span>
+                : <span className="text-blue-600">Tap to vote on restaurants →</span>}
             </div>
           )}
         </div>

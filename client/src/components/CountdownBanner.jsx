@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 
-function getTimeUntil(dateStr) {
+const DEPARTURE = new Date('2026-06-09T08:30:00-05:00');
+
+function getTimeUntil() {
   const now = new Date();
-  const target = new Date(dateStr + 'T00:00:00');
-  const diff = target - now;
+  const diff = DEPARTURE - now;
   if (diff <= 0) return null;
   const totalMinutes = Math.floor(diff / (1000 * 60));
   const days = Math.floor(totalMinutes / (60 * 24));
@@ -31,11 +32,11 @@ function todayLabel() {
 }
 
 export default function CountdownBanner() {
-  const [time, setTime] = useState(() => getTimeUntil('2026-06-09'));
+  const [time, setTime] = useState(() => getTimeUntil());
 
   useEffect(() => {
     const interval = time?.days === 0 ? 1000 : 60000;
-    const t = setInterval(() => setTime(getTimeUntil('2026-06-09')), interval);
+    const t = setInterval(() => setTime(getTimeUntil()), interval);
     return () => clearInterval(t);
   }, [time?.days]);
 
