@@ -124,10 +124,10 @@ export default function QuickRef() {
         <h2 className="font-bold text-amber-900 text-sm">⚠️ Important Reminders</h2>
         <ul className="text-sm text-amber-800 space-y-1.5">
           <li>• <strong>Intrepid Museum:</strong> Arrive at 2:00 PM SHARP — 30-min window only (Jun 11)</li>
-          <li>• <strong>Empire State Building:</strong> Arrive at 8:00 PM exactly — no rainchecks after scan (Jun 11)</li>
-          <li>• <strong>MSG:</strong> Cashless venue. Download tickets to phone before arriving (Jun 10)</li>
+          <li>• <strong>Empire State Building:</strong> Arrive at 7:30 PM exactly — no rainchecks after scan (Jun 10)</li>
+          <li>• <strong>MSG:</strong> Cashless venue. Download tickets to phone before arriving (Jun 11)</li>
           <li>• <strong>Hotel room merge:</strong> On Jun 11, re-check in at front desk — no need to move luggage</li>
-          <li>• <strong>ESB bonus:</strong> Free same-night return 9 PM–midnight on Jun 11 — no reservation needed</li>
+          <li>• <strong>ESB bonus:</strong> Free same-night return 8:30 PM–midnight on Jun 10 — no reservation needed</li>
         </ul>
       </div>
 
